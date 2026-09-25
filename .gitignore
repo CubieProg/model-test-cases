@@ -3,3 +3,5 @@
 *.7z
 *.DS_Store
 *.gif
+__pycache__/
+graphcoloring.egg-info/
