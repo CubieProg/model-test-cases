@@ -59,9 +59,10 @@ if __name__ == "__main__":
         datefmt="%H:%M:%S"
     )
     
-    run(64000, 1008, False, graphDistanceColoring)
+    # run(10000, 500, False, graphDistanceColoring)
 
-    # run(100, 16, True, graphDistanceColoringDsatur)
+
+    run(100, 16, True, graphDistanceColoringDsatur)
     # run(100, 16, True, graphDistanceColoring)
     # run(64000, 1008, False, graphDistanceColoring)
     # run(100, 16, True)
