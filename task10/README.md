@@ -39,7 +39,7 @@
 
 ### Картинки
 
-![Точки и их граф связей](assets/networkGraph.png)
+![Точки и их граф связей](images/networkGraph.png)
 
 ![Разбиение сферы на области Вороного](images/voronoiMesh.png)
 
