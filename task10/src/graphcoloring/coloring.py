@@ -105,7 +105,7 @@ def graphDistanceColoring(graph: nx.Graph, distance: int, maxColors: int) -> Tup
 
     usedColors = max(coloring.values())
     usedColors += 1
-    logging.debug(f"Граф раскрашен в {usedColors} цветов.")
+    # logging.debug(f"Граф раскрашен в {usedColors} цветов.")
 
     return coloring, usedColors
 
@@ -184,7 +184,7 @@ def graphDistanceColoringDsatur(graph: nx.Graph, distance: int, maxColors: int) 
 
     usedColors = max(coloring.values())
     usedColors += 1
-    logging.debug(f"Граф раскрашен в {usedColors} цветов.")
+    # logging.debug(f"Граф раскрашен в {usedColors} цветов.")
     
     return coloring, usedColors
 
@@ -238,14 +238,14 @@ def calcMaxColoringDistance(graph: nx.Graph, maxColors: int,
     distance = 1
     usedColors = 0
         
-    logging.debug(f"Считаем диаметр")
+    # logging.debug(f"Считаем диаметр")
     # diameter = nx.diameter(graph) # Диаметр считается очень долго!!!
     diameter = len(graph.nodes())
     
     memoizedGraph = graph.copy()
     
     # Расширяющийся поиск верхней оценки для расстояния
-    logging.debug(f"Начался расширяющийся поиск")
+    logging.debug(f"--- Расширяющийся поиск ---")
     while True:
         try:
             _, usedColors = strategy(memoizedGraph, 1, maxColors)
@@ -266,7 +266,7 @@ def calcMaxColoringDistance(graph: nx.Graph, maxColors: int,
     upperBoundary = distance
 
     
-    logging.debug(f"Начался бинарный поиск")
+    logging.debug(f"--- Бинарный поиск ---")
     while True:
         center = math.floor((lowerBoundary + upperBoundary) / 2)
         if center == distance:
@@ -278,11 +278,14 @@ def calcMaxColoringDistance(graph: nx.Graph, maxColors: int,
             # Можем -> повышаем нижнюю границу
             _, usedColors = strategy(graph, distance, maxColors)
             lowerBoundary = distance
+            logging.debug(f"Можно покрасить в {maxColors} цветов на дистанции {distance}")
         except ColoringError as e:
             # Не можем -> понижаем верхнюю границу
+            logging.debug(f"Нельзя покрасить в {maxColors} цветов на дистанции {distance}")
             upperBoundary = distance
 
-    logging.debug(f"Граф раскрашен в {usedColors} цветов на дистанции {distance}")
+    logging.debug(f"--- Рузультат ---")
+    logging.debug(f"Граф можно раскрасить в {usedColors} из {maxColors} цветов на дистанции {distance}")
     return distance #, nodeColors, coloring, usedColors
 
 
@@ -332,6 +335,7 @@ def calcMinimumColors(graph: nx.Graph, distance: int,
     usedColors = 0
 
     # Расширяющийся поиск верхней оценки для количества цветов
+    logging.debug(f"--- Расширяющийся поиск ---")
     while True:
         try:
             _, usedColors = strategy(graph, distance, maxColors)
@@ -341,4 +345,7 @@ def calcMinimumColors(graph: nx.Graph, distance: int,
             logging.debug(f"Нельзя покрасить в {maxColors} цветов на дистанции {distance}")
             maxColors *= 2
 
+    logging.debug(f"--- Рузультат ---")
+    logging.debug(f"Графу достаточно {usedColors} из {maxColors} цветов для {distance}-дистанционной раскраски")
+    
     return usedColors

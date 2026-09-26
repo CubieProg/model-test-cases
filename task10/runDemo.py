@@ -43,8 +43,7 @@ def run(nodesCount: int, maxColors: int, isPlotNeeded: bool = False,
     logging.info("-" * 48)
     two_distance_colors = calcMinimumColors(network.graph, 2, coloringStrategy)
 
-    logging.info(f"Графу достаточно {two_distance_colors} цветов для 2-дистанционной раскраски")
-    logging.info(("-" * 48) + "\n\n\n")
+    logging.info("-" * 48)
 
     
     if isPlotNeeded:
