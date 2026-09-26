@@ -1,6 +1,6 @@
 import numpy as np
 import networkx as nx
-from scipy.spatial import Delaunay, ConvexHull, SphericalVoronoi
+from scipy.spatial import ConvexHull, SphericalVoronoi
 from numpy import arange, pi, sin, cos, arccos
 
 from typing import List
@@ -98,6 +98,8 @@ class SphericalNetwork:
         verticiesToRegionsMap = {}
 
 
+        # Собираем вершины из треугольников в полигоны
+        # Указатель на первую вершину в текущем полигоне
         polygonPointer = 0
 
         for index, region in enumerate(voronoiDiagramm.regions):
@@ -130,7 +132,7 @@ class SphericalNetwork:
         return Mesh3D(
             meshVertices,
             meshTriangles,
-            [],
-            verticiesToRegionsMap
+            verticiesToRegionsMap,
+            []
         )
     

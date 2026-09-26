@@ -10,7 +10,6 @@ import plotly.graph_objects as go
 import numpy as np
 import networkx as nx
 
-from graphcoloring.Mesh3D import Mesh3D 
 from graphcoloring.SphericalNetwork import SphericalNetwork
 
 
@@ -38,7 +37,7 @@ def produceLines(graph: nx.Graph):
             yield [points[edge[0]], points[edge[1]]]
 
     # Собираем массивы координат, вставляя None между отрезками 
-    #   потому что go.Scatter3d без None будет рисовать ненужные линии
+    # потому что go.Scatter3d без None будет рисовать ненужные линии
     linesX, linesY, linesZ = [], [], []
 
     for segment in linesGenerator(graph): 
@@ -100,9 +99,12 @@ def plotNetwork(network: SphericalNetwork):
     
     figure = go.Figure()
 
+    # Добавляем сферу. trace = 0
     addSphere(figure)
     
     lines = produceLines(network.graph)
+
+    # Добавляем рёбра графа. trace = 1
     figure.add_trace(go.Scatter3d(
         x=lines[0,:], y=lines[1,:], z=lines[2,:],
         mode='lines',

@@ -24,5 +24,5 @@ class Mesh3D:
 
     vertices: NDArray[np.float64]
     triangles: NDArray[np.int64]
-    vertexColors: Dict
     verticiesToRegionsMap: List[List[int]]
+    vertexColors: Dict

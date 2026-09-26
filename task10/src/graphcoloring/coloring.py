@@ -3,6 +3,8 @@ coloring
 ------
 
 Модуль, предоставляющий методы раскраски графов и оптимизации раскрасок
+
+Алгоритмы раскрасок из `networkx` не используются т.к. им нельзя задать ограничение на максимальное количество цветов.
 """
 
 import logging
@@ -89,13 +91,15 @@ def graphDistanceColoring(graph: nx.Graph, distance: int, maxColors: int) -> Tup
     
     G: nx.Graph = nx.power(graph, distance)
 
+    # Жадный алгоритм идёт от вершин с большей степенью к вершинам с меньшей
     sortedNodes = sorted(G.nodes(), key=lambda n: G.degree(n), reverse=True)
-    
-    coloring = {}
+
+    # Сопоставление вершина: номер цвета
+    coloring = dict()
     for node in sortedNodes:
         coloredNeighbors = {coloring[neighbor] for neighbor in G.neighbors(node) if neighbor in coloring}
 
-        # Ищем первый доступный цвет < maxColors
+        # Ищем первый доступный цвет меньший чем maxColors
         for colorIndex in range(maxColors):
             if colorIndex not in coloredNeighbors:
                 coloring[node] = colorIndex
@@ -105,7 +109,6 @@ def graphDistanceColoring(graph: nx.Graph, distance: int, maxColors: int) -> Tup
 
     usedColors = max(coloring.values())
     usedColors += 1
-    # logging.debug(f"Граф раскрашен в {usedColors} цветов.")
 
     return coloring, usedColors
 
@@ -156,9 +159,13 @@ def graphDistanceColoringDsatur(graph: nx.Graph, distance: int, maxColors: int) 
 
     G: nx.Graph = nx.power(graph, distance)
 
+    # Сопоставление вершина: номер цвета
     coloring = dict()
-    uncoloredNodes = set(G.nodes()) # можно обойтись и без этого множества. Но, на каждой итерации цикла его нужно бедет высчитывать
+    uncoloredNodes = set(G.nodes()) # Можно обойтись и без этого множества. 
+                                    # Но, на каждой итерации цикла его нужно бедет высчитывать.
 
+    # DSATUR идёт по убыванию степени насыщения
+    # Функция считает степень насыщения для вершины
     def saturationDegree(node: int):
         neighborColors = {v for k, v in coloring.items() if k in G.neighbors(node)}
         return len(neighborColors)
@@ -166,16 +173,19 @@ def graphDistanceColoringDsatur(graph: nx.Graph, distance: int, maxColors: int) 
     while True:
         if len(coloring) == len(G.nodes):
             break
+
         # Выбираем вершину с максимальной степенью насыщения. Потом с максимальной степенью в графе
         maxSaturation = max(uncoloredNodes, key=saturationDegree)
         maxSaturation = saturationDegree(maxSaturation)
         maxSaturatedNodes = [node for node in uncoloredNodes if saturationDegree(node) == maxSaturation]
-        # if maxSaturatedNodes empty then ...
+        
         currentNode = max(maxSaturatedNodes, key=lambda node: G.degree[node])
 
+        # Ищем доступные цвета
         neighborColors = {v for k, v in coloring.items() if k in G.neighbors(currentNode)}
         availableColors = set(range(maxColors)).difference(neighborColors)
 
+        # Если доступного цвета нет, то нельзя раскрасить граф в maxColors цветов
         if len(availableColors) == 0:
             raise ColoringError(f"{maxColors} цветов не достаточно для раскраски графа!", maxColors)
 
@@ -184,7 +194,6 @@ def graphDistanceColoringDsatur(graph: nx.Graph, distance: int, maxColors: int) 
 
     usedColors = max(coloring.values())
     usedColors += 1
-    # logging.debug(f"Граф раскрашен в {usedColors} цветов.")
     
     return coloring, usedColors
 
@@ -228,6 +237,7 @@ def calcMaxColoringDistance(graph: nx.Graph, maxColors: int,
     Таким образом, функция максимизирует минимальное растояние между вершинами с одинаковыми цветами.
     """
 
+    # Проверяем валидность стратегии
     if not strategyName in STRATEGIES:
         availableStrategies = ", ".join(name for name in list(STRATEGIES.keys())) 
         raise ValueError(
@@ -237,10 +247,10 @@ def calcMaxColoringDistance(graph: nx.Graph, maxColors: int,
 
     distance = 1
     usedColors = 0
-        
-    # logging.debug(f"Считаем диаметр")
-    # diameter = nx.diameter(graph) # Диаметр считается очень долго!!!
-    diameter = len(graph.nodes())
+
+    # Изначально, diameter был одним из критериев остановки (где distance >= len (graph.nodes()))
+    # Однако, расчёт диаметра для графов с более 10000 вершинами занимал больше времени чем основные расчёты
+    # diameter = nx.diameter(graph) 
     
     memoizedGraph = graph.copy()
     
@@ -256,17 +266,15 @@ def calcMaxColoringDistance(graph: nx.Graph, maxColors: int,
             logging.debug(f"Нельзя покрасить в {maxColors} цветов на дистанции {distance}")
             break
 
-        if distance >= diameter:
+        if distance >= len(graph.nodes()):
             logging.info(f"Очень много ({maxColors}) цветов. Граф может быть раскрашен на любой дистанции")
-            return diameter
+            return len(graph.nodes())
 
-    # Бинарный поиск
-    # last_positive_result = distance
+    # Бинарный поиск точного расстояния
+    logging.debug(f"--- Бинарный поиск ---")
     lowerBoundary = distance / 2
     upperBoundary = distance
-
     
-    logging.debug(f"--- Бинарный поиск ---")
     while True:
         center = math.floor((lowerBoundary + upperBoundary) / 2)
         if center == distance:
@@ -323,6 +331,7 @@ def calcMinimumColors(graph: nx.Graph, distance: int,
     для `distance`-дистанционной раскраски.
     """
 
+    # Проверяем валидность стратегии
     if not strategyName in STRATEGIES:
         availableStrategies = ", ".join(name for name in list(STRATEGIES.keys())) 
         raise ValueError(
