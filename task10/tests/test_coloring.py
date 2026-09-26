@@ -26,8 +26,8 @@ def test_coloringK6():
 
 def test_maxColoringDistance():
     C6 = nx.cycle_graph(6)
-    distance = calcMaxColoringDistance(C6, 3)
-    assert distance == 3
+    distance = calcMaxColoringDistance(C6, 3, 'DSATUR')
+    assert distance == 2
     
 def test_minimumColors():
     C6 = nx.cycle_graph(6)

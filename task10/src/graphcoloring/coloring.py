@@ -13,8 +13,6 @@ from typing import Dict, Tuple
 from collections.abc import Callable
 
 
-
-
 class ColoringError(Exception):
     def __init__(self, message, colors):   
         super().__init__(message)
@@ -68,7 +66,15 @@ def graphDistanceColoring(graph: nx.Graph, distance: int, maxColors: int) -> Tup
     Raises
     ------
     ColoringError
-        В случае, если указанного `maxColors` не хватает для `distance`-дистанционной раскраска графа
+        В случае, если указанного `maxColors` не хватает для `distance`-дистанционной раскраска графа,
+        в том числе, если `maxColors` < 0.
+
+    TypeError
+        В случае, если `maxColors` не `int`.
+
+    ValueError
+        В случае, если `distance` < 0.
+
 
         
     Note
@@ -129,8 +135,14 @@ def graphDistanceColoringDsatur(graph: nx.Graph, distance: int, maxColors: int) 
     Raises
     ------
     ColoringError
-        В случае, если указанного `maxColors` не хватает для `distance`-дистанционной раскраска графа
+        В случае, если указанного `maxColors` не хватает для `distance`-дистанционной раскраска графа,
+        в том числе, если `maxColors` < 0.
 
+    TypeError
+        В случае, если `maxColors` не `int`.
+
+    ValueError
+        В случае, если `distance` < 0.
 
     Note
     ------
@@ -165,7 +177,7 @@ def graphDistanceColoringDsatur(graph: nx.Graph, distance: int, maxColors: int) 
         availableColors = set(range(maxColors)).difference(neighborColors)
 
         if len(availableColors) == 0:
-            raise ColoringError(f"{maxColors} colors is not enough!", maxColors)
+            raise ColoringError(f"{maxColors} цветов не достаточно для раскраски графа!", maxColors)
 
         coloring[currentNode] = min(availableColors)
         uncoloredNodes.remove(currentNode)
@@ -182,18 +194,6 @@ STRATEGIES = {
     "DSATUR": graphDistanceColoringDsatur
 }
 
-def graphDistanceColoringNx(
-        graph: nx.Graph, 
-        distance: int, 
-        strategy: str = 'strategy_saturation_largest_first') -> Tuple[Dict, int]:
-    G = nx.power(graph, distance)
-
-    coloring = nx.greedy_color(G, strategy=strategy)
-    usedColors = max(coloring.values())
-
-    logging.debug(f"Граф раскрашен в {usedColors} цветов.")
-
-    return coloring, usedColors
 
 
 def calcMaxColoringDistance(graph: nx.Graph, maxColors: int, 
@@ -288,7 +288,7 @@ def calcMaxColoringDistance(graph: nx.Graph, maxColors: int,
 
 
 def calcMinimumColors(graph: nx.Graph, distance: int, 
-                      strategyName: Callable = graphDistanceColoring) -> int:
+                      strategyName: str = "greedy") -> int:
     """Возвращает минимальное число `N` такое, 
     что граф `graph` может быть раскрашен `distance`-дистанционной раскраской в `N` цвета
 

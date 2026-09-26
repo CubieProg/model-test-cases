@@ -5,12 +5,15 @@
 
 import networkx as nx
 import logging
-from collections.abc import Callable
 
 from graphcoloring.SphericalNetwork import SphericalNetwork
-from graphcoloring.coloring import graphDistanceColoring, calcMaxColoringDistance, calcMinimumColors, graphDistanceColoringDsatur, convertColoringToRgb
-# import graphcoloring.coloring as coloring
-
+from graphcoloring.coloring import (
+    convertColoringToRgb,
+    graphDistanceColoring,
+    graphDistanceColoringDsatur, 
+    calcMaxColoringDistance, 
+    calcMinimumColors
+)
 
 import graphcoloring.draw as draw
 
@@ -18,13 +21,9 @@ import graphcoloring.draw as draw
 def run(nodesCount: int, maxColors: int, isPlotNeeded: bool = False, 
         coloringStrategy: str = 'greedy'):
 
-
-    
     network = SphericalNetwork(nodesCount)
 
-    # strategy = coloring.STRATEGIES.get(coloringStrategy)
     colorIndexes, _ = graphDistanceColoring(network.graph, 2, maxColors)
-
     nodeColors = convertColoringToRgb(colorIndexes)
 
     nx.set_node_attributes(network.graph, nodeColors, name="color")
@@ -64,6 +63,10 @@ if __name__ == "__main__":
         format="%(asctime)s | %(levelname)s: %(message)s",
         datefmt="%H:%M:%S"
     )
+
+    
+    C6 = nx.cycle_graph(6)
+    distance = calcMaxColoringDistance(C6, 3, 'DSATUR')
     
     # run(10000, 500, False, graphDistanceColoring)
 
