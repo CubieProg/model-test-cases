@@ -5,6 +5,7 @@
 
 import networkx as nx
 import logging
+import time
 
 from graphcoloring.SphericalNetwork import SphericalNetwork
 from graphcoloring.coloring import (
@@ -47,15 +48,11 @@ def run(nodesCount: int, maxColors: int, isPlotNeeded: bool = False,
 
     
     if isPlotNeeded:
-        draw.plotMesh3D(network.voronoiMesh)
-        draw.plotSphericalGraph(network.graph)
         draw.plotNetwork(network)
 
     return distance, two_distance_colors
 
 
-
-import time
 
 if __name__ == "__main__":
     logging.basicConfig(
@@ -65,8 +62,6 @@ if __name__ == "__main__":
     )
 
     
-    C6 = nx.cycle_graph(6)
-    distance = calcMaxColoringDistance(C6, 3, 'DSATUR')
     
     # run(10000, 500, False, graphDistanceColoring)
 
