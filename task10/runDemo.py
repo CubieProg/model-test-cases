@@ -9,15 +9,21 @@ from collections.abc import Callable
 
 from graphcoloring.SphericalNetwork import SphericalNetwork
 from graphcoloring.coloring import graphDistanceColoring, calcMaxColoringDistance, calcMinimumColors, graphDistanceColoringDsatur, convertColoringToRgb
+# import graphcoloring.coloring as coloring
+
 
 import graphcoloring.draw as draw
 
 
 def run(nodesCount: int, maxColors: int, isPlotNeeded: bool = False, 
-        coloringStrategy: Callable = graphDistanceColoring):
+        coloringStrategy: str = 'greedy'):
+
+
+    
     network = SphericalNetwork(nodesCount)
 
-    colorIndexes, _ = coloringStrategy(network.graph, 2, maxColors)
+    # strategy = coloring.STRATEGIES.get(coloringStrategy)
+    colorIndexes, _ = graphDistanceColoring(network.graph, 2, maxColors)
 
     nodeColors = convertColoringToRgb(colorIndexes)
 
@@ -88,12 +94,12 @@ if __name__ == "__main__":
     # end = time.perf_counter()
     # logging.debug(f"Время выполнения 64000x500: {end - start:.6f} сек")
 
-    start = time.perf_counter()
-    run(400, 25, False, graphDistanceColoringDsatur)
-    end = time.perf_counter()
-    logging.debug(f"Время выполнения 64000x1008: {end - start:.6f} сек")
+    # start = time.perf_counter()
+    # run(64000, 1008, False, graphDistanceColoringDsatur)
+    # end = time.perf_counter()
+    # logging.debug(f"Время выполнения 64000x1008: {end - start:.6f} сек")
 
     # run(100, 16, True, graphDistanceColoringDsatur)
-    # run(100, 16, True, graphDistanceColoring)
+    run(100, 16, True)
     # run(64000, 1008, False, graphDistanceColoring)
     # run(100, 16, True)
