@@ -1,6 +1,5 @@
 import pytest 
 import networkx as nx
-import matplotlib.pyplot as plt
 
 from graphcoloring.coloring import graphDistanceColoringDsatur, calcMaxColoringDistance, calcMinimumColors
 

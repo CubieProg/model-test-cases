@@ -11,7 +11,6 @@ from graphcoloring.SphericalNetwork import SphericalNetwork
 from graphcoloring.coloring import (
     convertColoringToRgb,
     graphDistanceColoring,
-    graphDistanceColoringDsatur, 
     calcMaxColoringDistance, 
     calcMinimumColors
 )

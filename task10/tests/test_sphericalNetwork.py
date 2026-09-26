@@ -12,4 +12,3 @@ def test_networkCreationDefaults():
     assert nodesCount == 100
     assert positionAttrsCount == 100
     assert isConnected
-

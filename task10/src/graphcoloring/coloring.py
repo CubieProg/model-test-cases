@@ -12,7 +12,6 @@ import networkx as nx
 import math
 from matplotlib.pyplot import get_cmap
 from typing import Dict, Tuple
-from collections.abc import Callable
 
 
 class ColoringError(Exception):
