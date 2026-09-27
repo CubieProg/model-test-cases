@@ -37,8 +37,7 @@ class WalkerGroup(Walker):
         inclination = np.deg2rad(self.inclination)
         altitude    = self.altitude * 1000
         satCount    = self.getTotalSatCount()
-
-        # Акронимы        
+    
         raans = np.linspace(startRaan, startRaan + maxRaan, self.planeCount + 1)
         raans = raans[:-1] % (2 * np.pi)
         
@@ -53,7 +52,6 @@ class WalkerGroup(Walker):
         
         sma = earthConstants.radius + altitude
         
-        # Магическая 6
         elements = np.zeros((satCount, 6))
         elements[:, 0] = sma
         elements[:, 3] = np.repeat(raans, self.satsPerPlane)
@@ -64,7 +62,6 @@ class WalkerGroup(Walker):
     
 
 class Constellation:
-
     def __init__(self, nameCode: str):
         self.totalSatCount: int                 = 0
         self.groups:        List[WalkerGroup]   = []
@@ -104,7 +101,6 @@ class Constellation:
     def propagateJ2(self, epochs: list[int]):
         self.stateEci = np.zeros((self.totalSatCount, 3, len(epochs)))
 
-        # Акронимы. Лично мне не понятно что они означают. Возможно, это какие-то известные сокращения
         inclination = self.elements[:, 4]
         sma = self.elements[:, 0]
         raan0 = self.elements[:, 3]
@@ -127,5 +123,3 @@ class Constellation:
                 (np.sin(aol) * np.sin(inclination))]
 
             self.stateEci[:, :, epochs.index(epoch)] = np.array(epochState).T
-
-        ...
