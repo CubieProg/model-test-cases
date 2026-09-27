@@ -56,10 +56,10 @@ if __name__ == "__main__":
     )
 
     start = time.perf_counter()
-    maxMinDistance, twoDistanceColors = run(100, 30, True)
+    maxMinDistance, twoDistanceColors = run(100, 20, True)
     end = time.perf_counter()
     logging.info(
-        f"""Процедура со 100 точками и 16 цветами исполнена за: {end - start:.6f} сек.
+        f"""Процедура со 100 точками и 20 цветами исполнена за: {end - start:.6f} сек.
         Максимизированное минимальное расстояние между вершинами разного цвета: {maxMinDistance}
         Минимальное количество цветов для 2-дистанционной раскраски: {twoDistanceColors}
         """)

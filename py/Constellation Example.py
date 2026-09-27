@@ -1,6 +1,7 @@
 from constellation import *
 from random import randint
 
+
 # создание объекта типа Constellation, инициализация параметрами группировки Stalink из конфига
 constellation = Constellation('Starlink')
 

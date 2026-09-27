@@ -6,7 +6,6 @@ from typing import NamedTuple
 class Parameters(object):
     pass
 
-
 Const = Parameters()
 Const.earthRadius = 6378135      # Экваториальный радиус Земли [m]
 Const.earthGM = 3.986004415e+14  # Гравитационный параметр Земли [m3/s2]
