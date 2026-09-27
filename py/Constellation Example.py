@@ -1,12 +1,11 @@
 from constellation import *
 from random import randint
 
-
 # создание объекта типа Constellation, инициализация параметрами группировки Stalink из конфига
 constellation = Constellation('Starlink')
 
 # вычисление элементов орбиты для всех КА в начальный момент
-constellation.getInitialState()
+constellation.initState()
 
 # определение точек на оси времени, в которые будут проихзводиться расчёты
 epochs = list(range(1002))
