@@ -65,7 +65,7 @@ if __name__ == "__main__":
         """)
     
     start = time.perf_counter()
-    run(64000, 1008, False)
+    maxMinDistance, twoDistanceColors = run(64000, 1008, False)
     end = time.perf_counter()
     logging.info(
         f"""Процедура со 64000 точками и 1008 цветами исполнена за: {end - start:.6f} сек.
