@@ -45,10 +45,45 @@ def convertColoringToRgb(coloring: Dict[int, int]) -> Dict[int, Tuple]:
 
 
 def calcGraphSphere(graph: nx.Graph, center: int, radius: int, punctured: bool = True) -> set[int]:
+    """Фнкция расчёта сферы в графе `graph` радиуса `radius` с центорм в вершине `center`.
+
+    Если параметер `punctured` равен `True`, то функция вернёт тот же результат, но без центра.
+
+    Parameters
+    ----------
+    graph : networkx.Graph
+        Граф, в котором нужно найти сферу
+    center : int 
+        Номер центральной вершины в графе `graph`
+    radius : int
+        Радиус сферы
+    punctured : bool
+        Если `True`, то вернёт сферу без центра.
+
+    Returns
+    -------
+    sphere : set[int]
+        Сфера в графе `graph` радиуса `radius` с центром в вершине `center`
+    
+    Raises
+    ------
+    NodeNotFound
+        В случае, если указанной вершины `center` нет в графе `graph`
+
+    TypeError
+        В случае, если `graph` не объект класса `networkx.Graph`.
+
+    Note
+    ------
+    В качестве параметра `radius` можно подать произвольный `float`. 
+    В таком случае, результат функции будет аналогичен, если подать `int(radius)`.
+    Если `radius < 0`, то вернёт пустое множество в независимости от параметра `punctured`.
+    """
+
     sphere = nx.single_source_shortest_path_length(graph, center, radius)
     sphere = set(sphere.keys())
 
-    if punctured:
+    if punctured and center in sphere:
         sphere.remove(center)
     return sphere
 
@@ -87,12 +122,10 @@ def graphDistanceColoring(graph: nx.Graph, distance: int, maxColors: int) -> Tup
     ValueError
         В случае, если `distance` < 0.
 
-
-        
     Note
     ------
-    Для `distance`-дистанционной раскраски графа, алгоритм на каждом шаге смотрит 
-    на сферы радиуса `distance` вокруг текущей врешины.
+    Для `distance`-дистанционной раскраски графа, 
+    алгоритм на каждом шаге считает сферы радиуса `distance` вокруг текущей врешины.
     """
     
 
@@ -155,14 +188,10 @@ def graphDistanceColoringDsatur(graph: nx.Graph, distance: int, maxColors: int) 
 
     Note
     ------
-    Для `distance`-дистанционной раскраски графа, изначальный `graph` возводится в степень `distance` 
-    и раскрашивается уже степень графа обычным методом. 
-
-    Описание корректности этого подхода смотри в 
-    "МИНИМАЛЬНЫЕ СТЕПЕНИ И ХРОМАТИЧЕСКИЕ ЧИСЛА КВАДРАТОВ ПЛОСКИХ ГРАФОВ" 
-    О. В. Бородин, X. Брусма, А. Н. Глебов, Я. ван ден Хойвел, стр. 2, абзацы 2-3.
+    Для `distance`-дистанционной раскраски графа, 
+    алгоритм на каждом шаге считает сферы радиуса `distance` вокруг текущей врешины.
     """
-    print("DSATUR start")
+    
     # Сопоставление вершина: номер цвета
     coloring = dict()
     uncoloredNodes = set(graph.nodes()) # Можно обойтись и без этого множества. 

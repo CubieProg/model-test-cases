@@ -11,27 +11,29 @@ from graphcoloring.SphericalNetwork import SphericalNetwork
 from graphcoloring.coloring import (
     convertColoringToRgb,
     graphDistanceColoring,
-    graphDistanceColoringDsatur,
     calcMaxColoringDistance, 
     calcMinimumColors
 )
 
 import graphcoloring.draw as draw
 
-
-def run(nodesCount: int, maxColors: int, isPlotNeeded: bool = False, 
-        coloringStrategy: str = 'greedy'):
-
+def demoPlot(nodesCount: int, maxColors: int):
     network = SphericalNetwork(nodesCount)
-    
+
     colorIndexes, _ = graphDistanceColoring(network.graph, 2, maxColors)
     nodeColors = convertColoringToRgb(colorIndexes)
 
     nx.set_node_attributes(network.graph, nodeColors, name="color")
     nx.set_node_attributes(network.graph, colorIndexes, name="color index")
-
+    
     network.voronoiMesh.vertexColors = nodeColors
+    
+    draw.plotNetwork(network)
+    
+def demoCalc(nodesCount: int, maxColors: int, coloringStrategy: str = 'greedy'):
+    network = SphericalNetwork(nodesCount)
 
+    logging.info(f"Запущена процедура со стратегией раскраски '{coloringStrategy}'")
     logging.info("Максимизация расстояния раскраски")
     logging.info("-" * 48)
     maxMinDistance = calcMaxColoringDistance(network.graph, maxColors, coloringStrategy)
@@ -42,10 +44,61 @@ def run(nodesCount: int, maxColors: int, isPlotNeeded: bool = False,
     twoDistanceColors = calcMinimumColors(network.graph, 2, coloringStrategy)
     logging.info("-" * 48)
     
-    if isPlotNeeded:
-        draw.plotNetwork(network)
-
     return maxMinDistance, twoDistanceColors
+
+
+def run():
+    # Рисуем маленький пример. (Рисование больших примеров занимает много времени)
+    demoPlot(100, 20)
+
+
+    # Запуск двух маленьких примеров для сравнения жадного алгоритма и DSATUR
+    # Запуск жадного алгоритма
+    start = time.perf_counter()
+    maxMinDistance, twoDistanceColors = demoCalc(
+        nodesCount = 100, 
+        maxColors = 20, 
+        coloringStrategy = "greedy"
+    )
+    end = time.perf_counter()
+    logging.info(
+        f"""Процедура со 100 точками и 20 цветами исполнена за: {end - start:.6f} сек.
+        Максимизированное минимальное расстояние между вершинами разного цвета: {maxMinDistance}
+        Минимальное количество цветов для 2-дистанционной раскраски: {twoDistanceColors}
+        """)
+    # Вывод: maxMinDistance, twoDistanceColors = 2, 13
+    
+    # Запуск алгоритма DSATUR
+    start = time.perf_counter()
+    maxMinDistance, twoDistanceColors = demoCalc(
+        nodesCount = 100, 
+        maxColors = 20, 
+        coloringStrategy = "DSATUR"
+    )
+    end = time.perf_counter()
+    logging.info(
+        f"""Процедура со 100 точками и 20 цветами исполнена за: {end - start:.6f} сек.
+        Максимизированное минимальное расстояние между вершинами разного цвета: {maxMinDistance}
+        Минимальное количество цветов для 2-дистанционной раскраски: {twoDistanceColors}
+        """)
+    # Вывод: maxMinDistance, twoDistanceColors = 2, 11
+    # Как видим, DSATUR даёт результат лучше чем greedy, но он требует больше времени
+
+
+    # Запуск алгоритма на больших данных
+    start = time.perf_counter()
+    maxMinDistance, twoDistanceColors = demoCalc(
+        nodesCount = 64000, 
+        maxColors = 1008, 
+        coloringStrategy = "greedy"
+    )
+    end = time.perf_counter()
+    logging.info(
+        f"""Процедура со 100 точками и 20 цветами исполнена за: {end - start:.6f} сек.
+        Максимизированное минимальное расстояние между вершинами разного цвета: {maxMinDistance}
+        Минимальное количество цветов для 2-дистанционной раскраски: {twoDistanceColors}
+        """)
+    # Вывод: maxMinDistance, twoDistanceColors = 23, 14
 
 
 
@@ -56,40 +109,4 @@ if __name__ == "__main__":
         datefmt="%H:%M:%S"
     )
 
-    start = time.perf_counter()
-    maxMinDistance, twoDistanceColors = run(
-        nodesCount = 100, 
-        maxColors = 20, 
-        isPlotNeeded = True,
-        strategy = "greedy"
-    )
-    end = time.perf_counter()
-    logging.info(
-        f"""Процедура со 100 точками и 20 цветами исполнена за: {end - start:.6f} сек.
-        Максимизированное минимальное расстояние между вершинами разного цвета: {maxMinDistance}
-        Минимальное количество цветов для 2-дистанционной раскраски: {twoDistanceColors}
-        """)
-
-
-    start = time.perf_counter()
-    maxMinDistance, twoDistanceColors = run(
-        nodesCount = 100, 
-        maxColors = 20, 
-        isPlotNeeded = True,
-        strategy = "DSATUR"
-    )
-    end = time.perf_counter()
-    logging.info(
-        f"""Процедура со 100 точками и 20 цветами исполнена за: {end - start:.6f} сек.
-        Максимизированное минимальное расстояние между вершинами разного цвета: {maxMinDistance}
-        Минимальное количество цветов для 2-дистанционной раскраски: {twoDistanceColors}
-        """)
-    
-    start = time.perf_counter()
-    maxMinDistance, twoDistanceColors = run(64000, 1008, False, "greedy") # output: 23, 14
-    end = time.perf_counter()
-    logging.info(
-        f"""Процедура со 64000 точками и 1008 цветами исполнена за: {end - start:.6f} сек.
-        Максимизированное минимальное расстояние между вершинами разного цвета: {maxMinDistance}
-        Минимальное количество цветов для 2-дистанционной раскраски: {twoDistanceColors}
-        """)
+    run()
