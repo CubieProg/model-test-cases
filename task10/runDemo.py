@@ -11,6 +11,7 @@ from graphcoloring.SphericalNetwork import SphericalNetwork
 from graphcoloring.coloring import (
     convertColoringToRgb,
     graphDistanceColoring,
+    graphDistanceColoringDsatur,
     calcMaxColoringDistance, 
     calcMinimumColors
 )
@@ -22,7 +23,7 @@ def run(nodesCount: int, maxColors: int, isPlotNeeded: bool = False,
         coloringStrategy: str = 'greedy'):
 
     network = SphericalNetwork(nodesCount)
-
+    
     colorIndexes, _ = graphDistanceColoring(network.graph, 2, maxColors)
     nodeColors = convertColoringToRgb(colorIndexes)
 
@@ -56,7 +57,27 @@ if __name__ == "__main__":
     )
 
     start = time.perf_counter()
-    maxMinDistance, twoDistanceColors = run(100, 20, True)
+    maxMinDistance, twoDistanceColors = run(
+        nodesCount = 100, 
+        maxColors = 20, 
+        isPlotNeeded = True,
+        strategy = "greedy"
+    )
+    end = time.perf_counter()
+    logging.info(
+        f"""Процедура со 100 точками и 20 цветами исполнена за: {end - start:.6f} сек.
+        Максимизированное минимальное расстояние между вершинами разного цвета: {maxMinDistance}
+        Минимальное количество цветов для 2-дистанционной раскраски: {twoDistanceColors}
+        """)
+
+
+    start = time.perf_counter()
+    maxMinDistance, twoDistanceColors = run(
+        nodesCount = 100, 
+        maxColors = 20, 
+        isPlotNeeded = True,
+        strategy = "DSATUR"
+    )
     end = time.perf_counter()
     logging.info(
         f"""Процедура со 100 точками и 20 цветами исполнена за: {end - start:.6f} сек.
@@ -65,7 +86,7 @@ if __name__ == "__main__":
         """)
     
     start = time.perf_counter()
-    maxMinDistance, twoDistanceColors = run(64000, 1008, False)
+    maxMinDistance, twoDistanceColors = run(64000, 1008, False, "greedy") # output: 23, 14
     end = time.perf_counter()
     logging.info(
         f"""Процедура со 64000 точками и 1008 цветами исполнена за: {end - start:.6f} сек.

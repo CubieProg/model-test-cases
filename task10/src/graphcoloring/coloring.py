@@ -20,6 +20,7 @@ class ColoringError(Exception):
         self.colors = colors
 
 
+
 def convertColoringToRgb(coloring: Dict[int, int]) -> Dict[int, Tuple]:
     """Функция конвертирует словарь `{номерВершины: номерЦвета}` в словарь `{номерВершины: (r, g, b)}`
 
@@ -40,6 +41,16 @@ def convertColoringToRgb(coloring: Dict[int, int]) -> Dict[int, Tuple]:
     nodeRgbColors = {k: cmap(v / max(1, colorsCount - 1)) for (k, v) in coloring.items()}
 
     return nodeRgbColors
+
+
+
+def calcGraphSphere(graph: nx.Graph, center: int, radius: int, punctured: bool = True) -> set[int]:
+    sphere = nx.single_source_shortest_path_length(graph, center, radius)
+    sphere = set(sphere.keys())
+
+    if punctured:
+        sphere.remove(center)
+    return sphere
 
 
 
@@ -80,23 +91,19 @@ def graphDistanceColoring(graph: nx.Graph, distance: int, maxColors: int) -> Tup
         
     Note
     ------
-    Для `distance`-дистанционной раскраски графа, изначальный `graph` возводится в степень `distance` 
-    и раскрашивается уже степень графа обычным методом. 
-
-    Описание корректности этого подхода смотри в 
-    "МИНИМАЛЬНЫЕ СТЕПЕНИ И ХРОМАТИЧЕСКИЕ ЧИСЛА КВАДРАТОВ ПЛОСКИХ ГРАФОВ" 
-    О. В. Бородин, X. Брусма, А. Н. Глебов, Я. ван ден Хойвел, стр. 2, абзацы 2-3.
+    Для `distance`-дистанционной раскраски графа, алгоритм на каждом шаге смотрит 
+    на сферы радиуса `distance` вокруг текущей врешины.
     """
     
-    G: nx.Graph = nx.power(graph, distance)
 
     # Жадный алгоритм идёт от вершин с большей степенью к вершинам с меньшей
-    sortedNodes = sorted(G.nodes(), key=lambda n: G.degree(n), reverse=True)
+    sortedNodes = sorted(graph.nodes(), key=lambda n: graph.degree(n), reverse=True)
 
     # Сопоставление вершина: номер цвета
     coloring = dict()
     for node in sortedNodes:
-        coloredNeighbors = {coloring[neighbor] for neighbor in G.neighbors(node) if neighbor in coloring}
+        sphere = calcGraphSphere(graph, node, distance)
+        coloredNeighbors = {coloring[neighbor] for neighbor in sphere if neighbor in coloring}
 
         # Ищем первый доступный цвет меньший чем maxColors
         for colorIndex in range(maxColors):
@@ -155,22 +162,20 @@ def graphDistanceColoringDsatur(graph: nx.Graph, distance: int, maxColors: int) 
     "МИНИМАЛЬНЫЕ СТЕПЕНИ И ХРОМАТИЧЕСКИЕ ЧИСЛА КВАДРАТОВ ПЛОСКИХ ГРАФОВ" 
     О. В. Бородин, X. Брусма, А. Н. Глебов, Я. ван ден Хойвел, стр. 2, абзацы 2-3.
     """
-
-    G: nx.Graph = nx.power(graph, distance)
-
+    print("DSATUR start")
     # Сопоставление вершина: номер цвета
     coloring = dict()
-    uncoloredNodes = set(G.nodes()) # Можно обойтись и без этого множества. 
+    uncoloredNodes = set(graph.nodes()) # Можно обойтись и без этого множества. 
                                     # Но, на каждой итерации цикла его нужно бедет высчитывать.
 
     # DSATUR идёт по убыванию степени насыщения
     # Функция считает степень насыщения для вершины
     def saturationDegree(node: int):
-        neighborColors = {v for k, v in coloring.items() if k in G.neighbors(node)}
+        neighborColors = {v for k, v in coloring.items() if k in graph.neighbors(node)}
         return len(neighborColors)
 
     while True:
-        if len(coloring) == len(G.nodes):
+        if len(coloring) == len(graph.nodes):
             break
 
         # Выбираем вершину с максимальной степенью насыщения. Потом с максимальной степенью в графе
@@ -178,10 +183,11 @@ def graphDistanceColoringDsatur(graph: nx.Graph, distance: int, maxColors: int) 
         maxSaturation = saturationDegree(maxSaturation)
         maxSaturatedNodes = [node for node in uncoloredNodes if saturationDegree(node) == maxSaturation]
         
-        currentNode = max(maxSaturatedNodes, key=lambda node: G.degree[node])
+        currentNode = max(maxSaturatedNodes, key=lambda node: graph.degree[node])
 
         # Ищем доступные цвета
-        neighborColors = {v for k, v in coloring.items() if k in G.neighbors(currentNode)}
+        sphere = calcGraphSphere(graph, currentNode, distance)
+        neighborColors = {v for k, v in coloring.items() if k in sphere}
         availableColors = set(range(maxColors)).difference(neighborColors)
 
         # Если доступного цвета нет, то нельзя раскрасить граф в maxColors цветов
@@ -257,9 +263,10 @@ def calcMaxColoringDistance(graph: nx.Graph, maxColors: int,
     logging.debug(f"--- Расширяющийся поиск ---")
     while True:
         try:
-            _, usedColors = strategy(memoizedGraph, 1, maxColors)
+            # _, usedColors = strategy(memoizedGraph, 1, maxColors)
+            _, usedColors = strategy(graph, distance, maxColors)
             logging.debug(f"Можно покрасить в {maxColors} цветов на дистанции {distance}")
-            memoizedGraph = nx.power(memoizedGraph, 2)
+            # memoizedGraph = nx.power(memoizedGraph, 2)
             distance *= 2
         except ColoringError as e:
             logging.debug(f"Нельзя покрасить в {maxColors} цветов на дистанции {distance}")
