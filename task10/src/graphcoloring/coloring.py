@@ -198,7 +198,7 @@ def graphDistanceColoringDsatur(graph: nx.Graph, distance: int, maxColors: int) 
                                     # Но, на каждой итерации цикла его нужно бедет высчитывать.
 
     # DSATUR идёт по убыванию степени насыщения
-    # Функция считает степень насыщения для вершины
+    # Функция считает степень насыщения для поданой вершины 
     def saturationDegree(node: int):
         neighborColors = {v for k, v in coloring.items() if k in graph.neighbors(node)}
         return len(neighborColors)
@@ -292,10 +292,9 @@ def calcMaxColoringDistance(graph: nx.Graph, maxColors: int,
     logging.debug(f"--- Расширяющийся поиск ---")
     while True:
         try:
-            # _, usedColors = strategy(memoizedGraph, 1, maxColors)
             _, usedColors = strategy(graph, distance, maxColors)
             logging.debug(f"Можно покрасить в {maxColors} цветов на дистанции {distance}")
-            # memoizedGraph = nx.power(memoizedGraph, 2)
+            
             distance *= 2
         except ColoringError as e:
             logging.debug(f"Нельзя покрасить в {maxColors} цветов на дистанции {distance}")
@@ -329,7 +328,7 @@ def calcMaxColoringDistance(graph: nx.Graph, maxColors: int,
 
     logging.debug(f"--- Рузультат ---")
     logging.debug(f"Граф можно раскрасить в {usedColors} из {maxColors} цветов на дистанции {distance}")
-    return distance #, nodeColors, coloring, usedColors
+    return distance
 
 
 

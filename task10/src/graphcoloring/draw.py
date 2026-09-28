@@ -41,10 +41,10 @@ def produceLines(graph: nx.Graph):
     linesX, linesY, linesZ = [], [], []
 
     for segment in linesGenerator(graph): 
-        (x0, y0, z0), (x1, y1, z1) = segment
-        linesX.extend([x0, x1, None])
-        linesY.extend([y0, y1, None])
-        linesZ.extend([z0, z1, None])
+        (startX, startY, startZ), (endX, endY, endZ) = segment
+        linesX.extend([startX, endX, None])
+        linesY.extend([startY, endY, None])
+        linesZ.extend([startZ, endZ, None])
 
     return np.array([linesX, linesY, linesZ])
 
@@ -57,14 +57,14 @@ def addSphere(figure: go.Figure):
         Figure, на котором будет отображена сфера
     """
 
-    eps = 0.925
+    radius = 0.925
     density = 100
 
     lon = np.linspace(0, 2 * np.pi, 2 * density)
     lat = np.linspace(0, np.pi, density)
-    sphereX = eps * np.outer(np.cos(lon), np.sin(lat))
-    sphereY = eps * np.outer(np.sin(lon), np.sin(lat))
-    sphereZ = eps * np.outer(np.ones_like(lon), np.cos(lat))
+    sphereX = radius * np.outer(np.cos(lon), np.sin(lat))
+    sphereY = radius * np.outer(np.sin(lon), np.sin(lat))
+    sphereZ = radius * np.outer(np.ones_like(lon), np.cos(lat))
 
     figure.add_trace(go.Surface(
         x=sphereX, y=sphereY, z=sphereZ,

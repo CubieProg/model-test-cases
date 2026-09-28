@@ -52,10 +52,10 @@ class SphericalNetwork:
 
     def calcFibonacciSphere(self, pointsCount: int) -> NDArray:
         goldenRatio = (1 + 5**0.5) / 2
-        i = arange(0, pointsCount)
+        pointsIdx = arange(0, pointsCount)
 
-        longitude = 2 * pi * i / goldenRatio
-        latitude = arccos(1 - 2 * (i + 0.5) / pointsCount)
+        longitude = 2 * pi * pointsIdx / goldenRatio
+        latitude = arccos(1 - 2 * (pointsIdx + 0.5) / pointsCount)
 
         x, y, z = cos(longitude) * sin(latitude), sin(longitude) * sin(latitude), cos(latitude)
 
@@ -115,8 +115,12 @@ class SphericalNetwork:
             verticesZ.extend(regionVertices[:, 2])
 
             # Триангулируем полигон веером
-            for t in range(1, verticiesCount - 1):
-                triangle = [polygonPointer, polygonPointer + t, polygonPointer + t + 1]
+            for triangleIdx in range(1, verticiesCount - 1):
+                triangle = [
+                    polygonPointer, 
+                    polygonPointer + triangleIdx, 
+                    polygonPointer + triangleIdx + 1
+                ]
 
                 triangles.append(triangle)
                 verticiesToRegionsMap.update({k: index for k in triangle})
