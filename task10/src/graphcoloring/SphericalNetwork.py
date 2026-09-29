@@ -50,6 +50,13 @@ class SphericalNetwork:
         self.graph = self.initGraphFromData(nodes, edges)
         self.voronoiMesh = self.calcVoronoiMesh(nodes)
 
+    @property
+    def maxNodesDegree(self):
+        nodes = self.graph.nodes()
+        degrees = self.graph.degree(nodes)
+
+        return max(deg for _, deg in degrees)
+
     def calcFibonacciSphere(self, pointsCount: int) -> NDArray:
         goldenRatio = (1 + 5**0.5) / 2
         pointsIdx = arange(0, pointsCount)

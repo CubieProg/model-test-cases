@@ -33,6 +33,8 @@ def demoPlot(nodesCount: int, maxColors: int):
 def demoCalc(nodesCount: int, maxColors: int, coloringStrategy: str = 'greedy'):
     network = SphericalNetwork(nodesCount)
 
+    logging.info(f"Построен граф с {nodesCount} вершинами. Максимальная степень вершин: {network.maxNodesDegree}")
+
     logging.info(f"Запущена процедура со стратегией раскраски '{coloringStrategy}'")
     logging.info("Максимизация расстояния раскраски")
     logging.info("-" * 48)
@@ -67,7 +69,8 @@ def run():
         Минимальное количество цветов для 2-дистанционной раскраски: {twoDistanceColors}
         """)
     # Вывод: maxMinDistance, twoDistanceColors = 2, 13
-    
+    # Максимальная степень вершин: 7
+
     # Запуск алгоритма DSATUR
     start = time.perf_counter()
     maxMinDistance, twoDistanceColors = demoCalc(
@@ -82,6 +85,7 @@ def run():
         Минимальное количество цветов для 2-дистанционной раскраски: {twoDistanceColors}
         """)
     # Вывод: maxMinDistance, twoDistanceColors = 2, 11
+    # Максимальная степень вершин: 7
     # Как видим, DSATUR даёт результат лучше чем greedy, но он требует больше времени
 
 
@@ -99,6 +103,7 @@ def run():
         Минимальное количество цветов для 2-дистанционной раскраски: {twoDistanceColors}
         """)
     # Вывод: maxMinDistance, twoDistanceColors = 23, 14
+    # Максимальная степень вершин: 7
 
 
 
