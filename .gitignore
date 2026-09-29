@@ -5,3 +5,4 @@
 *.gif
 __pycache__/
 graphcoloring.egg-info/
+.pytest_cache/

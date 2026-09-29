@@ -11,6 +11,7 @@ from graphcoloring.SphericalNetwork import SphericalNetwork
 from graphcoloring.coloring import (
     convertColoringToRgb,
     graphDistanceColoring,
+    graphDistanceColoringDsatur,
     calcMaxColoringDistance, 
     calcMinimumColors
 )
@@ -84,7 +85,7 @@ def run():
         Максимизированное минимальное расстояние между вершинами разного цвета: {maxMinDistance}
         Минимальное количество цветов для 2-дистанционной раскраски: {twoDistanceColors}
         """)
-    # Вывод: maxMinDistance, twoDistanceColors = 2, 11
+    # Вывод: maxMinDistance, twoDistanceColors = 2, 12
     # Максимальная степень вершин: 7
     # Как видим, DSATUR даёт результат лучше чем greedy, но он требует больше времени
 

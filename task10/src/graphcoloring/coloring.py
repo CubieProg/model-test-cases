@@ -199,20 +199,32 @@ def graphDistanceColoringDsatur(graph: nx.Graph, distance: int, maxColors: int) 
 
     # DSATUR идёт по убыванию степени насыщения
     # Функция считает степень насыщения для поданой вершины 
-    def saturationDegree(node: int):
-        neighborColors = {v for k, v in coloring.items() if k in graph.neighbors(node)}
+    def saturationDegree(node: int, distance: int):
+        sphere = calcGraphSphere(graph, node, distance)
+        neighborColors = {v for k, v in coloring.items() if k in sphere}
         return len(neighborColors)
+
+    def distanceDegree(node: int, distance: int):
+        sphere = calcGraphSphere(graph, node, distance)
+        return len(sphere)
 
     while True:
         if len(coloring) == len(graph.nodes):
             break
 
         # Выбираем вершину с максимальной степенью насыщения. Потом с максимальной степенью в графе
-        maxSaturation = max(uncoloredNodes, key=saturationDegree)
-        maxSaturation = saturationDegree(maxSaturation)
-        maxSaturatedNodes = [node for node in uncoloredNodes if saturationDegree(node) == maxSaturation]
-        
-        currentNode = max(maxSaturatedNodes, key=lambda node: graph.degree[node])
+        maxSaturationNode = max(uncoloredNodes, key= lambda n: saturationDegree(n, distance))
+        maxSaturation = saturationDegree(maxSaturationNode, distance)
+        maxSaturatedNodes = [node for node in uncoloredNodes if saturationDegree(node, distance) == maxSaturation]
+
+        # currentNode = max(maxSaturatedNodes, key=lambda node: graph.degree[node])
+        currentNode = max(maxSaturatedNodes, key=lambda node: distanceDegree(node, distance))
+
+
+        # currentNode = max(
+        #     uncoloredNodes,
+        #     key = lambda node: (saturationDegree(node), graph.degree(node))
+        # )
 
         # Ищем доступные цвета
         sphere = calcGraphSphere(graph, currentNode, distance)
@@ -228,9 +240,32 @@ def graphDistanceColoringDsatur(graph: nx.Graph, distance: int, maxColors: int) 
 
     usedColors = max(coloring.values())
     usedColors += 1
+
+    # testData = dict()
+    # for node in graph.nodes():
+    #     sphere = calcGraphSphere(graph, node, 2, False)
+    #     colorsInSphere = {n: coloring[n] for n in sphere}
+    #     testData[node] = colorsInSphere
+    #     ...
+
+        
+    # # testData[0]
+    # # calcGraphSphere(graph, 6, 2, False)
     
+    # checkCorrectivity(graph, coloring, distance)
     return coloring, usedColors
 
+
+def checkCorrectness(graph: nx.Graph, coloring: dict, distance: int):
+    for node in graph.nodes():
+        sphere = calcGraphSphere(graph, node, distance)
+        nodeColor = coloring[node]
+        conflictColors = {coloring[node] for node in sphere}
+
+        if nodeColor in conflictColors:
+            return False
+        
+    return True
 
 STRATEGIES = {
     "greedy": graphDistanceColoring,

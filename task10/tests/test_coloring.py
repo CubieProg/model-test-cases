@@ -1,7 +1,14 @@
 import pytest 
 import networkx as nx
 
-from graphcoloring.coloring import graphDistanceColoringDsatur, calcMaxColoringDistance, calcMinimumColors
+from graphcoloring.SphericalNetwork import SphericalNetwork
+from graphcoloring.coloring import (
+    graphDistanceColoring, 
+    graphDistanceColoringDsatur, 
+    calcMaxColoringDistance, 
+    calcMinimumColors, 
+    checkCorrectness
+)
 
 def test_coloringC6():
     C6 = nx.cycle_graph(6)
@@ -32,3 +39,17 @@ def test_minimumColors():
     C6 = nx.cycle_graph(6)
     colorsCount = calcMinimumColors(C6, 2)
     assert colorsCount == 3
+
+def test_correctnessGreedy():
+    network = SphericalNetwork(100)
+    distance = 2
+    maxColors = 20
+    coloring, _ = graphDistanceColoring(network.graph, distance, maxColors)
+    assert checkCorrectness(network.graph, coloring, distance)
+    
+def test_correctnessDsatur():
+    network = SphericalNetwork(100)
+    distance = 2
+    maxColors = 20
+    coloring, _ = graphDistanceColoringDsatur(network.graph, distance, maxColors)
+    assert checkCorrectness(network.graph, coloring, distance)
